@@ -1,4 +1,4 @@
-package org.example.housematesolution;
+package org.example.housematesolution.Controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
