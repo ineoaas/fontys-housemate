@@ -1,15 +1,14 @@
 services:
-  mysql:
-    image: mysql:8.4
+  postgres:
+    image: postgres:17
     environment:
-      MYSQL_DATABASE: housemate
-      MYSQL_USER: housemate
-      MYSQL_PASSWORD: housemate
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_DB: housemate
+      POSTGRES_USER: housemate
+      POSTGRES_PASSWORD: housemate
     ports:
-      - "3306:3306"
+      - "5432:5432"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD-SHELL", "pg_isready -U housemate -d housemate"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -17,11 +16,11 @@ services:
   app:
     build: .
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     environment:
-      DB_HOST: mysql
-      DB_PORT: "3306"
+      DB_HOST: postgres
+      DB_PORT: "5432"
       DB_NAME: housemate
       DB_USERNAME: housemate
       DB_PASSWORD: housemate

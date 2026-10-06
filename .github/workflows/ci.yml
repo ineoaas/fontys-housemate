@@ -14,17 +14,16 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
-        image: mysql:8.4
+      postgres:
+        image: postgres:17
         env:
-          MYSQL_DATABASE: housemate
-          MYSQL_USER: housemate
-          MYSQL_PASSWORD: housemate
-          MYSQL_ROOT_PASSWORD: root
+          POSTGRES_DB: housemate
+          POSTGRES_USER: housemate
+          POSTGRES_PASSWORD: housemate
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping -h localhost"
+          --health-cmd="pg_isready -U housemate -d housemate"
           --health-interval=5s
           --health-timeout=5s
           --health-retries=10
@@ -46,7 +45,7 @@ jobs:
         run: ./gradlew test --no-daemon
         env:
           DB_HOST: 127.0.0.1
-          DB_PORT: "3306"
+          DB_PORT: "5432"
           DB_NAME: housemate
           DB_USERNAME: housemate
           DB_PASSWORD: housemate
