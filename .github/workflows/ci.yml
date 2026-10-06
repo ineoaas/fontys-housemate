@@ -12,6 +12,9 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Backend
 
     services:
       postgres:
@@ -53,6 +56,9 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Backend
 
     steps:
       - name: Checkout
@@ -84,6 +90,6 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: Backend
           push: false
           tags: housemate-solution:${{ github.sha }}
