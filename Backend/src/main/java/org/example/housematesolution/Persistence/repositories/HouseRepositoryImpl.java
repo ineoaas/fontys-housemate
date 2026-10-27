@@ -6,6 +6,7 @@ import org.example.housematesolution.Persistence.entities.HouseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class HouseRepositoryImpl implements HouseRepository {
@@ -30,6 +31,11 @@ public class HouseRepositoryImpl implements HouseRepository {
     @Override
     public boolean existsByJoinCode(String joinCode) {
         return jpa.existsByJoinCode(joinCode);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return jpa.existsById(id);
     }
 
     @Override

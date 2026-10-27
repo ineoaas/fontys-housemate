@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class HouseService {
@@ -26,7 +28,6 @@ public class HouseService {
         this.joinCodeGenerator = joinCodeGenerator;
     }
 
-    // @Transactional: the house and the user are saved together, or not at all
     @Transactional
     public User createHouse(String houseName, String name, String email) {
         // 1. An email can only be used by one user
@@ -66,5 +67,12 @@ public class HouseService {
         // 4. Create the new user (id is null, the database generates it) and save it
         User newUser = new User(null, name, email, house.get());
         return userRepository.save(newUser);
+    }
+
+    public List<User> getHousemates(UUID houseId) {
+        if (!houseRepository.existsById(houseId)) {
+            throw new HouseNotFoundException(houseId);
+        }
+        return userRepository.findByHouseId(houseId);
     }
 }
