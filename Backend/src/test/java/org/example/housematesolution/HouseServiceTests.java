@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -141,5 +142,42 @@ class HouseServiceTests {
                 () -> houseService.joinHouse("ABC123", "Inci", "inci@example.com"));
 
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    // Get housemates
+    @Test
+    void getHousematesReturnsUsersOfHouse() {
+        when(houseRepository.existsById(house.getId())). thenReturn(true);
+        when(userRepository.findByHouseId(house.getId())).thenReturn(
+                List.of(
+                        new User(UUID.randomUUID(), "Inci", "inci@example.com", house),
+                        new User(UUID.randomUUID(), "Justin", "justin@example.com", house)
+                )
+        );
+
+        List<User> result = houseService.getHousemates(house.getId());
+
+        assertEquals(2, result.size());
+        assertEquals("Inci", result.get(0).getName());
+        assertEquals("Justin", result.get(1).getName());
+    }
+
+    @Test
+    void getHousematesReturnsEmptyListWhenNoUsers() {
+        when(houseRepository.existsById(house.getId())). thenReturn(true);
+        when(userRepository.findByHouseId(house.getId())).thenReturn(List.of());
+
+        List<User> result = houseService.getHousemates(house.getId());
+
+        assertEquals(0, result.size());
+    }
+    
+    @Test
+    void GetHousematesThrowsWhenHouseDoesNotExist() {
+        when(!houseRepository.existsById(house.getId())).thenReturn(false);
+        assertThrows(HouseNotFoundException.class,
+                () -> houseService.getHousemates(house.getId()));
+        
+        verify(userRepository, never()).findByHouseId(any(UUID.class));
     }
 }
