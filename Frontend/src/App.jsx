@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import CreateHouseForm from './components/CreateHouseForm.jsx'
 import JoinHouseForm from './components/JoinHouseForm.jsx'
+import ViewHousematesList from './components/ViewHousematesList.jsx'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -22,6 +23,8 @@ function App() {
       </p>
       <p>Share this join code with your housemates:</p>
       <p>{user.joinCode}</p>
+      <h2>List of Housemates</h2>
+      <ViewHousematesList user={user} />
       <button onClick={() => setUser(null)}>Back</button>
     </main>
   )
