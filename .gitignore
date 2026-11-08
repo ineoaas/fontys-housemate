@@ -9,3 +9,6 @@
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Live database backups made by deploy/backup.sh (they contain real user data)
+deploy/backups/
