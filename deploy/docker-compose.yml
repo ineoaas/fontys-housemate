@@ -1,0 +1,69 @@
+# Runs the whole app on this PC and puts it online through a Cloudflare tunnel.
+
+# Start:            docker compose up -d                (from this folder, with a .env file, see .env.example)
+# Public link:      docker compose logs cloudflared | grep trycloudflare.com
+# Stop:             docker compose down                 (the database is kept in the "pgdata" volume)
+
+# Continuous deployment: every push to main makes release.yml publish a new image to GHCR.
+# Watchtower checks GHCR every 5 minutes and restarts the app with the new image when there is one.
+name: housemate
+
+services:
+  live-database:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: housemate
+      POSTGRES_USER: housemate
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    # No "ports": the database is only reachable from the app, not from outside
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U housemate -d housemate"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    # Built and pushed by .github/workflows/release.yml on every push to main
+    image: ghcr.io/ineoaas/fontys-housemate-backend:latest
+    restart: unless-stopped
+    depends_on:
+      live-database:
+        condition: service_healthy
+    environment:
+      DB_HOST: live-database
+      DB_PORT: "5432"
+      DB_NAME: housemate
+      DB_USERNAME: housemate
+      DB_PASSWORD: ${DB_PASSWORD}
+    labels:
+      # Only this container is auto-updated by Watchtower
+      com.centurylinklabs.watchtower.enable: "true"
+    # Only reachable from this PC itself (http://localhost:8081); the public goes through the tunnel
+    ports:
+      - "127.0.0.1:8081:8080"
+
+  # Gives the app a public https://<random>.trycloudflare.com link. No Cloudflare account needed.
+  # The link stays the same while this container runs, but changes when it restarts (e.g. after a reboot).
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.7
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://app:8080
+    depends_on:
+      - app
+
+  # Watches GHCR for a new app image and redeploys it (maintained fork; the original containrrr/watchtower is archived)
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:1.23.2
+    restart: unless-stopped
+    environment:
+      WATCHTOWER_LABEL_ENABLE: "true"  # only update containers with the label above
+      WATCHTOWER_POLL_INTERVAL: "300"  # seconds
+      WATCHTOWER_CLEANUP: "true"       # delete the old image after updating
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  pgdata:
