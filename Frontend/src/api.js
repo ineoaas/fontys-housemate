@@ -1,3 +1,5 @@
+import { validate as isUuid } from 'uuid'
+
 async function post(url, data) {
   const response = await fetch(url, {
     method: 'POST',
@@ -34,5 +36,8 @@ async function get(url) {
 }
 
 export function getHousemates(houseId) {
-  return get(`/houses/${houseId}/housemates`)
+  if (!isUuid(houseId)) {
+    throw new Error(`${houseId} is not a valid house ID`)
+  }
+  return get(`/houses/${encodeURIComponent(houseId)}/housemates`)
 }

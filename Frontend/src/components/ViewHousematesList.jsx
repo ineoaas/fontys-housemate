@@ -15,7 +15,7 @@ function ViewHousematesList({ user }) {
       }
     }
 
-    fetchHousemates()
+    void fetchHousemates()
   }, [user.houseId])
 
   return (
