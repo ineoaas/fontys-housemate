@@ -1,10 +1,15 @@
 name: Release
 
-# Every push to main builds the backend image and stores it in GitHub Container Registry,
-# so there is always a ready-to-deploy image (ghcr.io/<owner>/<repo>-backend)
+# Builds the image and stores it in GitHub Container Registry (ghcr.io/<owner>/<repo>-backend).
+# Watchtower on the live PC picks up the new "latest" image, so publishing here = deploying.
+# That's why this only runs after CI has passed on main: a commit with failing tests never goes live.
 on:
-  push:
+  workflow_run:
+    workflows: [ CI ]
+    types: [ completed ]
     branches: [ main ]
+  # "Run workflow" button in the Actions tab, e.g. to retry after a failed build
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,11 +17,18 @@ permissions:
 
 jobs:
   publish-backend:
+    # Only after a successful CI run for a push to main (not a pull request), or when started by hand
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
 
     steps:
+      # Build exactly the commit that CI tested
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -28,11 +40,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Tags the image with the commit SHA (e.g. sha-a569e00) and "latest"
+      # Tags the image with the commit SHA (e.g. sha-a569e00) and "latest".
+      # "context: git" takes the SHA from the checked-out commit instead of the workflow trigger.
       - name: Work out image name and tags
         id: meta
         uses: docker/metadata-action@v5
         with:
+          context: git
           images: ghcr.io/${{ github.repository }}-backend
           tags: |
             type=sha

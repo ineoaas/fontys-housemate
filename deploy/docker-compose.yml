@@ -1,7 +1,7 @@
 # Runs the whole app on this PC and puts it online through a Cloudflare tunnel.
 
 # Start:            docker compose up -d                (from this folder, with a .env file, see .env.example)
-# Public link:      docker compose logs cloudflared | grep trycloudflare.com
+# Public link:      ./link.sh
 # Stop:             docker compose down                 (the database is kept in the "pgdata" volume)
 
 # Continuous deployment: every push to main makes release.yml publish a new image to GHCR.

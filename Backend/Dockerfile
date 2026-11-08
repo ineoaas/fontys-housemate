@@ -10,16 +10,18 @@ COPY Frontend ./
 RUN npm run build
 
 # Stage 2: build the jar (needs the full JDK)
-FROM eclipse-temurin:21-jdk AS build
+# The Gradle image already has Gradle installed, so the build doesn't depend on downloading it
+# from services.gradle.org (which timed out on GitHub). Keep the version the same as in
+# gradle/wrapper/gradle-wrapper.properties.
+FROM gradle:9.7.1-jdk21 AS build
 WORKDIR /app
-COPY Backend/gradlew Backend/settings.gradle Backend/build.gradle ./
-COPY Backend/gradle gradle
-RUN ./gradlew --no-daemon dependencies
+COPY Backend/settings.gradle Backend/build.gradle ./
+RUN gradle --no-daemon dependencies
 
 COPY Backend/src src
 # Spring Boot serves everything in resources/static, so the website and the API come from the same app
 COPY --from=frontend /frontend/dist src/main/resources/static
-RUN ./gradlew --no-daemon bootJar
+RUN gradle --no-daemon bootJar
 RUN mv build/libs/*.jar app.jar
 
 # Stage 3: run the jar (only needs the smaller JRE, and nothing from the build is left behind)
