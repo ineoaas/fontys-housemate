@@ -6,10 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import org.example.housematesolution.Business.domain.House;
 
 import java.util.UUID;
 
+@Getter
 @Entity
 @Table(name = "houses")
 public class HouseEntity {
@@ -42,15 +44,4 @@ public class HouseEntity {
         return new House(id, name, joinCode);
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getJoinCode() {
-        return joinCode;
-    }
 }

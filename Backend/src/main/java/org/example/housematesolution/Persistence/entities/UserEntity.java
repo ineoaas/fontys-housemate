@@ -8,10 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import org.example.housematesolution.Business.domain.User;
 
 import java.util.UUID;
 
+@Getter
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -51,19 +53,4 @@ public class UserEntity {
         return new User(id, name, email, house.toDomain());
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public HouseEntity getHouse() {
-        return house;
-    }
 }
