@@ -66,18 +66,22 @@ jobs:
 
       # The dependency jars Gradle downloaded, so the Java rules know the libraries' types
       - name: Find dependency jars for SonarQube Cloud
-        if: env.HAS_SONAR_TOKEN == 'true'
+        if: env.HAS_SONAR_TOKEN == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: echo "SONAR_JAVA_LIBRARIES=$HOME/.gradle/caches/modules-2/files-2.1/**/*.jar" >> "$GITHUB_ENV"
 
       # Analyzes Backend and Frontend (settings in sonar-project.properties) and fails when the
-      # Quality Gate fails. Skipped when the token isn't available, e.g. for pull requests from forks.
+      # Quality Gate fails, which also stops Release (it only runs after CI passes on main).
+      # Only on pushes to main: the SonarQube Cloud Free plan can't analyze other branches or pull requests.
+      # Skipped when the token isn't available.
       - name: SonarQube Cloud analysis
-        if: env.HAS_SONAR_TOKEN == 'true'
+        if: env.HAS_SONAR_TOKEN == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: SonarSource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          args: -Dsonar.java.libraries=${{ env.SONAR_JAVA_LIBRARIES }}
+          args: >-
+            -Dsonar.java.libraries=${{ env.SONAR_JAVA_LIBRARIES }}
+            -Dsonar.java.test.libraries=${{ env.SONAR_JAVA_LIBRARIES }}
 
   frontend:
     runs-on: ubuntu-latest
