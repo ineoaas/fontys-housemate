@@ -8,8 +8,15 @@ on:
     workflows: [ CI ]
     types: [ completed ]
     branches: [ main ]
-  # "Run workflow" button in the Actions tab, e.g. to retry after a failed build
+  # "Run workflow" button in the Actions tab, e.g. to retry after a failed build.
+  # To test changes to this file before merging, run it on dev with "publish" off:
+  #   gh workflow run release.yml --ref dev -f publish=false
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the image (this deploys it). Turn off to only test the workflow."
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -40,24 +47,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Tags the image with the commit SHA (e.g. sha-a569e00) and "latest".
-      # "context: git" takes the SHA from the checked-out commit instead of the workflow trigger.
+      # The SHA of the checked-out (tested) commit. github.sha can point at a different
+      # commit when this workflow is started by CI finishing, so read it from git.
+      - name: Get commit SHA
+        id: commit
+        run: |
+          echo "full=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "short=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+
+      # Tags the image with the commit SHA (e.g. sha-a569e00) and "latest"
       - name: Work out image name and tags
         id: meta
         uses: docker/metadata-action@v5
         with:
-          context: git
           images: ghcr.io/${{ github.repository }}-backend
           tags: |
-            type=sha
+            type=raw,value=sha-${{ steps.commit.outputs.short }}
             type=raw,value=latest
+          labels: |
+            org.opencontainers.image.revision=${{ steps.commit.outputs.full }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Backend/Dockerfile
-          push: true
+          # Always publish after CI; when started by hand, only if "publish" is on
+          push: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
