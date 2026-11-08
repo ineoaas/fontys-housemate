@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
+    // Test coverage report for SonarQube Cloud (the Sonar settings are in sonar-project.properties in the repo root)
+    id 'jacoco'
 }
 
 group = 'org.example'
@@ -35,4 +37,14 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    // Every test run also writes the coverage report
+    finalizedBy 'jacocoTestReport'
+}
+
+tasks.named('jacocoTestReport') {
+    dependsOn 'test'
+    reports {
+        xml.required = true // the format SonarQube Cloud reads
+        html.required = true // for looking at coverage yourself: build/reports/jacoco/test/html/index.html
+    }
 }
