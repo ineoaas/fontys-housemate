@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import org.example.housematesolution.Business.domain.User;
 import org.example.housematesolution.Business.services.HouseService;
 import org.example.housematesolution.Presentation.dtos.CreateHouseRequest;
-import org.example.housematesolution.Presentation.dtos.JoinHouseRequest;
 import org.example.housematesolution.Presentation.dtos.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,12 +33,6 @@ public class HouseController {
     public UserResponse createHouse(@Valid @RequestBody CreateHouseRequest request) {
         User creator = houseService.createHouse(request.houseName(), request.name(), request.email());
         return UserResponse.fromDomain(creator);
-    }
-
-    @PostMapping("/join")
-    public UserResponse joinHouse(@Valid @RequestBody JoinHouseRequest request) {
-        User user = houseService.joinHouse(request.joinCode(), request.name(), request.email());
-        return UserResponse.fromDomain(user);
     }
 
     @GetMapping("/{houseId}/housemates")

@@ -1,5 +1,11 @@
+# For developing on your own laptop. The live site uses deploy/docker-compose.yml instead.
+
+# Only the database (to run the backend from IntelliJ):  docker compose up -d dev-database
+# Database + the app built from your local code:         docker compose up --build
+name: housemate-dev
+
 services:
-  postgres:
+  dev-database:
     image: postgres:17
     environment:
       POSTGRES_DB: housemate
@@ -14,12 +20,15 @@ services:
       retries: 10
 
   app:
-    build: .
+    # The image also contains the frontend, so it is built from the repository root
+    build:
+      context: ..
+      dockerfile: Backend/Dockerfile
     depends_on:
-      postgres:
+      dev-database:
         condition: service_healthy
     environment:
-      DB_HOST: postgres
+      DB_HOST: dev-database
       DB_PORT: "5432"
       DB_NAME: housemate
       DB_USERNAME: housemate

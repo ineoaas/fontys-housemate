@@ -18,7 +18,7 @@ export function createHouse(houseName, name, email) {
 }
 
 export function joinHouse(joinCode, name, email) {
-  return post('/houses/join', { joinCode, name, email })
+  return post('/users', { joinCode, name, email })
 }
 
 // GET request helper functions for fetching data from the backend API

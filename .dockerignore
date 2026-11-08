@@ -1,0 +1,13 @@
+# Keep the Docker build context small: only sources are needed
+.git
+.github
+.idea
+.vscode
+**/node_modules
+**/dist
+**/build
+**/.gradle
+**/.env
+**/.env.*
+Frontend/design_research
+deploy

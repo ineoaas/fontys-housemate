@@ -8,6 +8,7 @@ export default defineConfig({
     // Send API calls to the Spring Boot backend, so we don't need CORS
     proxy: {
       '/houses': 'http://localhost:8080',
+      '/users': 'http://localhost:8080',
     },
   },
 })
