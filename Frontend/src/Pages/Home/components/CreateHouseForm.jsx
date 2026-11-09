@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createHouse } from '../api.js'
+import { createHouse } from '../../../api.js'
 
 function CreateHouseForm({ onSuccess }) {
   const [error, setError] = useState('')

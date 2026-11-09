@@ -41,3 +41,17 @@ export function getHousemates(houseId) {
   }
   return get(`/houses/${encodeURIComponent(houseId)}/housemates`)
 }
+
+export function getChores(houseId) {
+  if (!isUuid(houseId)) {
+    throw new Error(`${houseId} is not a valid house ID`)
+  }
+  return get(`/houses/${encodeURIComponent(houseId)}/chores`)
+}
+
+export function createChore(houseId, name, intervalDays, effort) {
+  if (!isUuid(houseId)) {
+    throw new Error(`${houseId} is not a valid house ID`)
+  }
+  return post(`/houses/${encodeURIComponent(houseId)}/chores`, { name, intervalDays, effort })
+}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { joinHouse } from '../api.js'
+import { joinHouse } from '../../../api.js'
 
 function JoinHouseForm({ onSuccess }) {
   const [error, setError] = useState('')
