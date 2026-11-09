@@ -60,4 +60,9 @@ public class ChoreRepositoryImpl implements ChoreRepository {
     public ChoreCompletion saveCompletion(ChoreCompletion choreCompletion) {
         return null;
     }
+
+    @Override
+    public boolean existsByHouseIdAndName(UUID houseId, String name) {
+        return jpa.existsByHouseIdAndName(houseId, name);
+    }
 }

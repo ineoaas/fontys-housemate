@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface HouseRepository {
 
+    Optional<House> findById(UUID id);
     Optional<House> findByJoinCode(String joinCode);
 
     boolean existsByJoinCode(String joinCode);

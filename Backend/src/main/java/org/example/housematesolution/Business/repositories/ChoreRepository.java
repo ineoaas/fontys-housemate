@@ -16,4 +16,6 @@ public interface ChoreRepository {
     // Oldest first
     List<ChoreCompletion> findCompletionsByChoreId(UUID choreId);
     ChoreCompletion saveCompletion(ChoreCompletion choreCompletion);
+
+    boolean existsByHouseIdAndName(UUID houseId, String name);
 }
