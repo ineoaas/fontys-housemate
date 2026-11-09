@@ -70,7 +70,7 @@ jobs:
         run: echo "SONAR_JAVA_LIBRARIES=$HOME/.gradle/caches/modules-2/files-2.1/**/*.jar" >> "$GITHUB_ENV"
 
       # Analyzes Backend and Frontend (settings in sonar-project.properties) and fails when the
-      # Quality Gate fails, which also stops Release (it only runs after CI passes on main).
+      # Quality Gate fails.
       # Only on pushes to main: the SonarQube Cloud Free plan can't analyze other branches or pull requests.
       # Skipped when the token isn't available.
       - name: SonarQube Cloud analysis
@@ -109,7 +109,7 @@ jobs:
       - name: Build
         run: npm run build
 
-  # Only checks that the Dockerfile still builds. Pushing happens in release.yml.
+  # Only checks that the Dockerfile still builds.
   docker:
     runs-on: ubuntu-latest
 
