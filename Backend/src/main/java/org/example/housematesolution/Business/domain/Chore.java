@@ -1,13 +1,11 @@
 package org.example.housematesolution.Business.domain;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@Setter
 public class Chore {
 
     private UUID id;
@@ -24,21 +22,5 @@ public class Chore {
         this.effort = effort;
         this.createdAt = createdAt;
         this.house = house;
-    }
-
-    public int getIntervalDays() {
-        return intervalDays;
-    }
-
-    public int getEffort() {
-        return effort;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public House getHouse() {
-        return house;
     }
 }

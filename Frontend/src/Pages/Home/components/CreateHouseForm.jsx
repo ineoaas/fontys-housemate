@@ -1,19 +1,20 @@
 import { useState } from 'react'
-import { joinHouse } from '../api.js'
+import { createHouse } from '../../../api.js'
 
-function JoinHouseForm({ onSuccess }) {
+function CreateHouseForm({ onSuccess }) {
   const [error, setError] = useState('')
 
+  // Runs when the user clicks the button
   async function handleSubmit(event) {
     event.preventDefault() // stop the browser from reloading the page
 
     const form = new FormData(event.target)
-    const joinCode = form.get('joinCode')
+    const houseName = form.get('houseName')
     const name = form.get('name')
     const email = form.get('email')
 
     try {
-      const user = await joinHouse(joinCode, name, email)
+      const user = await createHouse(houseName, name, email)
       onSuccess(user)
     } catch (e) {
       setError(e.message)
@@ -22,11 +23,11 @@ function JoinHouseForm({ onSuccess }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Join a house</h2>
+      <h2>Create a house</h2>
 
       <p>
         <label>
-          Join code <input name="joinCode" placeholder="e.g. K7QX2M" maxLength={20} required />
+          House name <input name="houseName" maxLength={50} required />
         </label>
       </p>
 
@@ -44,9 +45,9 @@ function JoinHouseForm({ onSuccess }) {
 
       {error && <p>{error}</p>}
 
-      <button type="submit">Join house</button>
+      <button type="submit">Create house</button>
     </form>
   )
 }
 
-export default JoinHouseForm
+export default CreateHouseForm

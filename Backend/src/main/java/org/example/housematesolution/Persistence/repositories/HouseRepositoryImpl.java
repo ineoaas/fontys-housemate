@@ -18,6 +18,17 @@ public class HouseRepositoryImpl implements HouseRepository {
     }
 
     @Override
+    public Optional<House> findById(UUID id) {
+        Optional<HouseEntity> houseEntity = jpa.findById(id);
+
+        if (houseEntity.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(houseEntity.get().toDomain());
+    }
+
+    @Override
     public Optional<House> findByJoinCode(String joinCode) {
         Optional<HouseEntity> houseEntity = jpa.findByJoinCode(joinCode);
 

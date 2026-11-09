@@ -1,18 +1,23 @@
-# For developing on your own laptop. The live site uses deploy/docker-compose.yml instead.
+# Runs Housemate locally with Docker (run these from the Backend folder).
 
-# Only the database (to run the backend from IntelliJ):  docker compose up -d dev-database
-# Database + the app built from your local code:         docker compose up --build
-name: housemate-dev
+# Only the database (to run the backend from IntelliJ):  docker compose up -d database
+# Database + the app built from your local code:         docker compose up -d --build   (http://localhost:8080)
+# Stop:                                                  docker compose down   (the data is kept in the "db-data" volume)
+name: housemate
 
 services:
-  dev-database:
+  database:
     image: postgres:17
+    restart: unless-stopped
     environment:
       POSTGRES_DB: housemate
       POSTGRES_USER: housemate
       POSTGRES_PASSWORD: housemate
+    # Only reachable from this PC, because the password is simple
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U housemate -d housemate"]
       interval: 5s
@@ -24,14 +29,18 @@ services:
     build:
       context: ..
       dockerfile: Backend/Dockerfile
+    restart: unless-stopped
     depends_on:
-      dev-database:
+      database:
         condition: service_healthy
     environment:
-      DB_HOST: dev-database
+      DB_HOST: database
       DB_PORT: "5432"
       DB_NAME: housemate
       DB_USERNAME: housemate
       DB_PASSWORD: housemate
     ports:
       - "8080:8080"
+
+volumes:
+  db-data:

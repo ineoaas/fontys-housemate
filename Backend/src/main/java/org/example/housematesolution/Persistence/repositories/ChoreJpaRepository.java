@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface ChoreJpaRepository extends JpaRepository<ChoreEntity, UUID> {
 
     List<ChoreEntity> findByHouseId(UUID house_id);
+
+    boolean existsByHouseIdAndName(UUID houseId, String name);
 }

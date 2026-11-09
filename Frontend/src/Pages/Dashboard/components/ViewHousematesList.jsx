@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getHousemates } from '../api.js'
+import { getHousemates } from '../../../api.js'
 
 function ViewHousematesList({ user }) {
   const [housemates, setHousemates] = useState([])

@@ -1,32 +1,28 @@
 import { useState } from 'react'
-import CreateHouseForm from './components/CreateHouseForm.jsx'
-import JoinHouseForm from './components/JoinHouseForm.jsx'
-import ViewHousematesList from './components/ViewHousematesList.jsx'
+import Sidebar from './components/Sidebar.jsx'
+import HomePage from './Pages/Home/HomePage.jsx'
+import DashboardPage from './Pages/Dashboard/DashboardPage.jsx'
+import ChoresPage from './Pages/Chores/ChoresPage.jsx'
 
 function App() {
   const [user, setUser] = useState(null)
-    if (user === null) {
-    return (
-      <main>
-        <h1>Housemate Solution</h1>
-        <CreateHouseForm onSuccess={setUser} />
-        <JoinHouseForm onSuccess={setUser} />
-      </main>
-    )
+  const [page, setPage] = useState('dashboard')
+
+  if (user === null) {
+    return <HomePage onSuccess={setUser} />
+  }
+
+  function handleBack() {
+    setUser(null)
+    setPage('dashboard')
   }
 
   return (
-    <main>
-      <h1>Welcome, {user.name}!</h1>
-      <p>
-        You live in <strong>{user.houseName}</strong>.
-      </p>
-      <p>Share this join code with your housemates:</p>
-      <p>{user.joinCode}</p>
-      <h2>List of Housemates</h2>
-      <ViewHousematesList user={user} />
-      <button onClick={() => setUser(null)}>Back</button>
-    </main>
+    <div>
+      <Sidebar currentPage={page} onNavigate={setPage} />
+      {page === 'dashboard' && <DashboardPage user={user} onBack={handleBack} />}
+      {page === 'chores' && <ChoresPage user={user} />}
+    </div>
   )
 }
 
