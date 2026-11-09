@@ -1,5 +1,6 @@
 package org.example.housematesolution.Presentation.controllers;
 
+import org.example.housematesolution.Business.exceptions.ChoreAlreadyExistsException;
 import org.example.housematesolution.Business.exceptions.EmailAlreadyUsedException;
 import org.example.housematesolution.Business.exceptions.HouseNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyUsedException.class)
     public ResponseEntity<String> handleEmailUsed(EmailAlreadyUsedException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ChoreAlreadyExistsException.class)
+    public ResponseEntity<String> handleChoreExists(ChoreAlreadyExistsException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
