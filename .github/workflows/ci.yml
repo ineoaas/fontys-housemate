@@ -23,22 +23,6 @@ jobs:
       run:
         working-directory: Backend
 
-    # HousemateSolutionApplicationTests starts the whole app, which needs a database
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_DB: housemate
-          POSTGRES_USER: housemate
-          POSTGRES_PASSWORD: housemate
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U housemate -d housemate"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=10
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -56,13 +40,8 @@ jobs:
 
       # "build" compiles, runs the tests, writes the coverage report and makes the jar in one go
       - name: Build and test
+        # Tests that need a database start their own PostgreSQL with Testcontainers (Docker is on the runner)
         run: ./gradlew build --no-daemon
-        env:
-          DB_HOST: 127.0.0.1
-          DB_PORT: "5432"
-          DB_NAME: housemate
-          DB_USERNAME: housemate
-          DB_PASSWORD: housemate
 
       # The dependency jars Gradle downloaded, so the Java rules know the libraries' types
       - name: Find dependency jars for SonarQube Cloud

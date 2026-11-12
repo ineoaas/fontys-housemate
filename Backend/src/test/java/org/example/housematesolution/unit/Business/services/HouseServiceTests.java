@@ -1,4 +1,4 @@
-package org.example.housematesolution;
+package org.example.housematesolution.unit.Business.services;
 
 import org.example.housematesolution.Business.domain.House;
 import org.example.housematesolution.Business.domain.User;

@@ -4,6 +4,7 @@ package org.example.housematesolution.Persistence.repositories;
 import org.example.housematesolution.Business.domain.Chore;
 import org.example.housematesolution.Business.domain.ChoreCompletion;
 import org.example.housematesolution.Business.repositories.ChoreRepository;
+import org.example.housematesolution.Persistence.entities.ChoreCompletionEntity;
 import org.example.housematesolution.Persistence.entities.ChoreEntity;
 
 import org.springframework.stereotype.Repository;
@@ -17,9 +18,11 @@ import java.util.UUID;
 public class ChoreRepositoryImpl implements ChoreRepository {
 
     private final ChoreJpaRepository jpa;
+    private final ChoreCompletionJpaRepository completionJpa;
 
-    public ChoreRepositoryImpl(ChoreJpaRepository jpa) {
+    public ChoreRepositoryImpl(ChoreJpaRepository jpa, ChoreCompletionJpaRepository completionJpa) {
         this.jpa = jpa;
+        this.completionJpa = completionJpa;
     }
 
     @Override
@@ -53,12 +56,20 @@ public class ChoreRepositoryImpl implements ChoreRepository {
 
     @Override
     public List<ChoreCompletion> findCompletionsByChoreId(UUID choreId) {
-        return List.of();
+        List<ChoreCompletionEntity> completionEntities = completionJpa.findByChoreIdOrderByCompletedAtAsc(choreId);
+
+        List<ChoreCompletion> completions = new ArrayList<>();
+        for (ChoreCompletionEntity completionEntity : completionEntities) {
+            completions.add(completionEntity.toDomain());
+        }
+        return completions;
     }
 
     @Override
     public ChoreCompletion saveCompletion(ChoreCompletion choreCompletion) {
-        return null;
+        ChoreCompletionEntity completionEntity = ChoreCompletionEntity.fromDomain(choreCompletion);
+        ChoreCompletionEntity savedEntity = completionJpa.save(completionEntity);
+        return savedEntity.toDomain();
     }
 
     @Override
